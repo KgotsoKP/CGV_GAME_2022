@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ExampleGame</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="base.css">
+</head>
+<body>
+
+  <script src = "vendors/three.min.js" ></script>
+  <script src = "vendors/fflate.min.js" ></script>
+  <script src = "vendors/FBXLoader.js"  ></script>
+  <script src="./lerp.js"></script>
+  <script src="./game.js"></script>
+  <script src = "./main.js" ></script>
+  <div id = "info">
+    <div id="title">Player's log</div>
+    <div class="divider"></div>
+    <div id="stage_row">Stage: <div id="stage"></div></div>
+    <div id="score_row">Score: <div id="score"></div></div>
+    <div id="distance_row">Distance: <div id="distance"></div></div>
+    <div id="divider"></div>
+    <div>Player health</div>
+    <input id="health" type ="range" min="0" max="100" disabled>
+    
+  </div>
+
+  <div id="intro_panel">
+    <div id="intro_column">
+    <div id="intro_title">Example Game</div>
+    <button id = "start_btn">Start</button>
+    </div>
+  </div>
+
+
+  <div id="game_over_panel">
+    <div id="game_over_column">
+    <div id="game_over_title">Game Over</div>
+    <div id="game_over_score_row">Score: <div id="game_score"></div></div>
+    <div id="game_over_distance_row">Distance: <div id="game_distance"></div></div>
+    <button id = "replay_button">Replay</button>
+    </div>
+  </div>
+  <div id="ball_panel">
+    <div id="ball_column">
+    <input type ="text" id="ball_title" disabled>
+    </div>
+  </div>
+
+  <div id="game_won_panel">
+    <div id="game_won_column">
+    <div id="game_won_title">You won</div>
+    <div id="game_won_score_row">Score: <div id="game_won_score"></div></div>
+    <div id="game_won_distance_row">Distance: <div id="game_won_distance"></div></div>
+    <button id = "replay_won_button">Replay</button>
+  </div>
+</body> 
+
+
+</html>
