@@ -68,28 +68,20 @@ class Game{
             this.rotationLerp.update(timeDelta);
         }
 
-
+        this._mixers.map(mixer => mixer.update(0.03));
 
         //controls this speed of the model
-        this.translateX += this.speedX * -0.05;
-        this._mixers_idle.map(mixer => mixer.update(0));
-        //this.check();
-
-        //this._updateGrid();
-        //this._checkCollisions();
-        //this._updateInfoPAnel();
-        this.red();
-        this.green();
-        this.red();
+        this.translateX += this.speedX * -0.2;
+        this._updateGrid();
         this._checkCollisions();
         this._updateInfoPAnel();
+        
     }
     
 
     _reset(replay){
         //initailize variables 
         this.running  = false;
-
         this.speedZ = 10;
         this.speedX = 0;  //-1:left, 0:straight, 1:right
         this.translateX = 0;
@@ -112,51 +104,50 @@ class Game{
 
         //prepare three 3d 
         this._initializeScene(this.scene,this.camera,replay);
+        this._change();
     }
 
-   sleep(func,ms) {
-        setTimeout(func,ms)
+   async sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms))
       }
 
 
     red(){
+        //this is to spawn the killer functions
         this.divBall.value = 'red';
+        this._spawnKillers();
+    }
+    
+    _spawnKillers(){
+        const material = new THREE.MeshBasicMaterial( { color: "red" } );
+        const killers = new THREE.Mesh(
+            this.OBSTACLE_PREFAB,
+            material
+        );
         
+        this._setupObstacle(killers);
 
-         //this makes the grid 'move' 
-         this.grid.material.uniforms.time.value =this.time;
-
-         //this makes the objects seem like they are coming towards the player
-         this.objectsParent.position.z = this.speedZ *this.time;
- 
-         // to make the actual object('I think')
-         this.grid.material.uniforms.translateX.value =this.translateX;
-         this.objectsParent.position.x = this.translateX;
+        this.KILLERSS.add(killers);
         
-        
-        //This is to respawn the objects with recreating or deleting
-        this.objectsParent.traverse((child)=> {
-            //check that we are in a child
-            if(child instanceof THREE.Mesh){
-                //give the actual z position of the object(bonus or obstacle)
-                const childZPos = child.position.z + this.objectsParent.position.z;
-
-                if(childZPos>0){
-                    //reset the object
-                    if(child.userData.type === 'obstacle'){
-                        this._setupObstacle(child,-this.translateX,-this.objectsParent.position.z);
-                        
-                    }
-                }
-
-
-            }
-        });
     }
 
     green(){
+        
         this.divBall.value = 'green';
-        this._updateGrid();
+        this._spawnBoosters();
+             
+    }
+
+
+
+   async _change(){
+
+        this.red();
+        await this.sleep(10000);
+        this.green()
+        await this.sleep(5000);           
+        this._change();
+
     }
 
 
@@ -167,20 +158,18 @@ class Game{
         switch(event.key){
             case 'ArrowLeft':
                 newSpeedX =-1.0;
-                this._mixers.map(mixer => mixer.update(0.03));
-               
                 break;
             case 'ArrowRight' :
                 newSpeedX = 1.0;
-               this._mixers.map(mixer => mixer.update(-0.03));
+               
                 break;
             case 'ArrowUp' :
                 newSpeedX = 0.0;
-                this._mixers.map(mixer => mixer.update(-0.02));
+                
             default:
                 return;
         }
-        if(!this.speedX !== newSpeedX){
+        if(this.speedX !== newSpeedX){
             this.speedX = newSpeedX;
             this._rotateModel(-this.speedX * 20 * Math.PI/180,0.02);
         }
@@ -192,16 +181,14 @@ class Game{
        // reset to 'idle' mode. 
        this.speedX = 0.0;
        this._rotateModel(0,0.5);
-
-       this._mixers_idle.map(mixer => mixer.update(0.1));
        
        
     }
 
     _rotateModel(targetRotation,delay){
         const $this = this;
-        this.rotationLerp =  new Lerp(this.OBJECT_MODEL.rotation.y,targetRotation,delay)
-            .onUpdate((value)=>{$this.OBJECT_MODEL.rotation.y = value})
+        this.rotationLerp =  new Lerp(this.OBJECT_MODEL.rotation.z,targetRotation,delay)
+            .onUpdate((value)=>{$this.OBJECT_MODEL.rotation.z = value})
             .onFinish(() =>{$this.rotationLerp = null})
         }       
 
@@ -216,11 +203,13 @@ class Game{
 
         //this makes the objects seem like they are coming towards the player
         this.objectsParent.position.z = this.speedZ *this.time;
-
+        this.KILLERSS.position.z = this.speedZ *this.time;
+        this.Boosters.position.z = this.speedZ *this.time;
         // to make the actual object('I think')
         this.grid.material.uniforms.translateX.value =this.translateX;
         this.objectsParent.position.x = this.translateX;
-       
+        this.KILLERSS.position.x = this.translateX;
+        this.Boosters.position.x = this.translateX;
        
         //This is to respawn the objects with recreating or deleting
         this.objectsParent.traverse((child)=> {
@@ -239,6 +228,41 @@ class Game{
                         child.userData.price = price;
                         
                     }
+                }
+
+
+            }
+        });
+
+        //This is to respawn the objects with recreating or deleting
+        this.KILLERSS.traverse((child)=> {
+            //check that we are in a child
+            if(child instanceof THREE.Mesh){
+                //give the actual z position of the object(bonus or obstacle)
+                const childZPos = child.position.z + this.KILLERSS.position.z;
+
+                if(childZPos>0){
+                    //reset the object
+                    
+                        this._setupObstacle(child,-this.translateX,-this.KILLERSS.position.z);
+                        
+                    
+                }
+
+
+            }
+        });
+
+        //This is to respawn the boosters
+        this.Boosters.traverse((child)=> {
+            //check that we are in a child
+            if(child instanceof THREE.Mesh){
+                //give the actual z position of the object(bonus or obstacle)
+                const childZPos = child.position.z + this.Boosters.position.z;
+
+                if(childZPos>0){
+                    //reset the object
+                        this._setupObstacle(child,-this.translateX,-this.Boosters.position.z);
                 }
 
 
@@ -282,11 +306,53 @@ class Game{
                             //game won
                             this._gameWin();
                         }
-
-                       
-
                    }
+               }
+            }
+       });
 
+       //killers
+       this.KILLERSS.traverse((child)=> {
+        //check that we are in a child
+        if(child instanceof THREE.Mesh){
+            //give the actual z position of the object(bonus or spawn)
+            const childZPos = child.position.z + this.KILLERSS.position.z;
+            
+            //threshold distances
+           const thresholdX = this.COLLISION_THRESHOLD + child.scale.x/2;
+           const thresholdZ = this.COLLISION_THRESHOLD + child.scale.z/2;
+
+           if(
+               childZPos > -thresholdZ &&
+               Math.abs(child.position.x + this.translateX)< thresholdX
+                ){
+               //Collisions
+               this._gameOver();
+             }
+            }
+        });
+
+        //obstacles and points
+        this.Boosters.traverse((child)=> {
+            //check that we are in a child
+            if(child instanceof THREE.Mesh){
+                //give the actual z position of the object(bonus or spawn)
+                const childZPos = child.position.z + this.Boosters.position.z;
+                
+                //threshold distances
+               const thresholdX = this.COLLISION_THRESHOLD + child.scale.x/2;
+               const thresholdZ = this.COLLISION_THRESHOLD + child.scale.z/2;
+
+               if(
+                   childZPos > -thresholdZ &&
+                   Math.abs(child.position.x + this.translateX)< thresholdX
+               ){
+                   //Boosters increase the health of the player
+                const params = [child,-this.translateX,this.Boosters.position.z];
+                    this.health +=10;
+                    this.divHealth.value = this.health;
+                    console.log('Health:' ,this.health);
+                    this._setupObstacle(...params);
                }
 
             
@@ -473,13 +539,19 @@ class Game{
             this.objectsParent = new THREE.Group();
             scene.add(this.objectsParent);
 
-            
+            this.KILLERSS = new THREE.Group();
+            scene.add(this.KILLERSS);
+
+            this.Boosters = new THREE.Group();
+            scene.add(this.Boosters);
             
             
             //spawn bonuses
             for(let i = 0;i<10;i++){
                 this._spawnBonuses();
             }
+
+    
             
             // move the camera back so it can see the model
             camera.rotateX(-20 * Math.PI/180);
@@ -542,6 +614,19 @@ class Game{
                         price: price};
         // add to scene
         this.objectsParent.add(obj);
+
+    }
+
+    _spawnBoosters(){
+        const obj = new THREE.Mesh(
+            this.BONUS_PREFAB,
+            new THREE.MeshBasicMaterial({color: 'green'})
+        );
+        
+        this._setupObstacle(obj);
+
+        // add to scene
+        this.Boosters.add(obj);
 
     }
 
