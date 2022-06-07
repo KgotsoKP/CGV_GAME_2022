@@ -1,4 +1,12 @@
-class Game{
+//import {Sky} from "./objects/sky";
+//import {objectsInit} from "./objects";
+
+
+//The Logic for the stage completion
+//Create a Stage completed function
+//
+
+class s2{
     OBSTACLE_PREFAB = new THREE.BoxBufferGeometry(1,1,1);
     OBSTACLE_MATERIAL = new THREE.MeshBasicMaterial({ color: 0xccdeee});
     BONUS_PREFAB = new THREE.SphereBufferGeometry(1,12,12);
@@ -35,13 +43,19 @@ class Game{
         this.scene = scene;
         this.camera = camera;
 
-        document.getElementById('next_level_button').onclick = () =>{
+        document.getElementById('replay_won_button').onclick = () =>{
             this.running = true;
+            //load Stage 2
+            //this.isCompleted(true);
+            console.log("Stage 2 : Active");
+           // this._resetToStage2(true);
             this.divGameWonPanel.style.display = 'none';
         };
 
         this._reset(false);
 
+       
+        
         // bind event callbacks
         document.addEventListener('keydown',this._keyDown.bind(this));
         document.addEventListener('keydown',this._keyDown.bind(this));
@@ -50,8 +64,6 @@ class Game{
     }
 
   
-    /*This is called in main.js under animate to always update the game.
-    */
     update(){
         if(!this.running)
             return;
@@ -79,6 +91,7 @@ class Game{
         this.red();
         this._checkCollisions();
         this._updateInfoPAnel();
+        //this.isCompleted(this.stageCompleted);
     }
     
 
@@ -88,9 +101,9 @@ class Game{
 
         this.speedZ = 10;
         this.speedX = 0;  //-1:left, 0:straight, 1:right
-        this.translateX = 0;
-        this.health  = 10;
-        this.stage = 1;
+        this.translateX = 600;
+        this.health  = 500;
+        this.stage = 500;
         this.score = 0;
         this.rotationLerp = null;
         this.time = 0;
@@ -106,11 +119,10 @@ class Game{
         this.divHealth.value = this.health;
         this.divScore.innerText = this.score;
 
-        //prepare three 3d
+        //prepare three 3d 
         this._initializeScene(this.scene,this.camera,replay);
     }
 
-    //Must take in current score
     _resetToStage2(replay){
         //initailize variables 
         this.running  = false;
@@ -120,13 +132,13 @@ class Game{
         this.translateX = 0;
         this.health  = 10;
         this.stage = 2;
-        this.score = 25;
+        this.score = 0;
         this.rotationLerp = null;
         this.time = 0;
         this.clock = new THREE.Clock();
 
-        //this._mixers = [];
-        //this._mixers_idle = [];
+        this._mixers = [];
+        this._mixers_idle = [];
         
 
         //show initial value
@@ -137,35 +149,7 @@ class Game{
 
         //prepare three 3d 
         this._StageTwo(this.scene,this.camera,replay);
-    } 
-
-    _resetToStage3(replay){
-        //initailize variables 
-        this.running  = false;
-
-        this.speedZ = 10;
-        this.speedX = 0;  //-1:left, 0:straight, 1:right
-        this.translateX = 0;
-        this.health  = 10;
-        this.stage = 3;
-        this.score = 0;
-        this.rotationLerp = null;
-        this.time = 0;
-        this.clock = new THREE.Clock();
-
-        //this._mixers = [];
-        //this._mixers_idle = [];
-        
-
-        //show initial value
-        this.divDistance.innerText = 600;
-        this.divStage.innerText = this.stage;
-        this.divHealth.value = this.health;
-        this.divScore.innerText = this.score;
-
-        //prepare three 3d 
-        this._StageThree(this.scene,this.camera,replay);
-    } 
+    }
 
    sleep(func,ms) {
         setTimeout(func,ms)
@@ -332,17 +316,14 @@ class Game{
                         child.userData.price = this._setupBonus(...params);
                         this.divScore.innerText= this.score;
                         
-
-                        //Go to level 2
-                        if(this.score > 20 && this.stage == 1){
-                           this._setUpStage2();
+                        if(this.score > 20){
+                            //game won
+                           this._gameWin();
+                           //this._StageTwo(this.scene,this.camera,replay);
+                           //this._initializeScene(this.scene,this.camera,replay);
+                          // this.stageCompleted = true;
                         }
 
-
-                        //Go to level 3
-                        if(this.score > 30 && this.stage == 2){
-                           this._setUpStage3();
-                        }
                        
 
                    }
@@ -356,6 +337,7 @@ class Game{
 
     _updateInfoPAnel(){
         this.divDistance.innerText = this.objectsParent.position.z.toFixed(0);
+
     }
 
     _gameOver(){
@@ -373,8 +355,7 @@ class Game{
         //reset variables
 
     }
-
-    _setUpStage2(){
+    _gameWin(){
 
         //prepare the endstate 
         this.running = false;
@@ -385,25 +366,7 @@ class Game{
         this.divGameWonDistance.innerText=this.objectsParent.position.z.toFixed(0);
         setTimeout(() => {
             this.divGameWonPanel.style.display = 'grid';
-           let  temp = this.score;
             this._resetToStage2(true);
-            this.score = temp;
-        });
-
-    }
-
-    _setUpStage3(){
-
-        //prepare the endstate 
-        this.running = false;
-
-        
-        //show ui 
-        this.divGameWonScore.innerText = this.score;
-        this.divGameWonDistance.innerText=this.objectsParent.position.z.toFixed(0);
-        setTimeout(() => {
-            this.divGameWonPanel.style.display = 'grid';
-            this._resetToStage3(true);
         });
 
     }
@@ -576,42 +539,6 @@ class Game{
     _StageTwo(scene,camera,replay){
 
         if(!replay){
-            
-           
-
-           
-            
-        }else{
-            for(let i = 0;i<15;i++){
-                console.log("Ran")
-              //spawn obstacles
-              this._spawnObstacles();
-            }
-
-            //replay
-            this.objectsParent.traverse((item) =>{
-                if(item instanceof THREE.Mesh){
-                    //child item
-                    if(item.userData.type === 'obstacle'){
-                        this._setupObstacle(item);
-                    }
-                    else{
-                        item.userData.price = this._setupBonus(item);
-                    }
-                }else{
-                    //anchor itself
-                    item.position.set(0,0,0)
-                }
-            });
-        }
-
-    }
-
-    _StageThree(scene,camera,replay){
-
-        console.log("Hi stage 3 | replay ", replay);
-        if(!replay){
-            /*
             //first load
             const light = new THREE.AmbientLight("#F78FFF");
             scene.add(light);
@@ -622,31 +549,25 @@ class Game{
             // this for loading obstacles and bonuses
             this.objectsParent = new THREE.Group();
             scene.add(this.objectsParent);
-*/
-           // for(let i = 0;i<10;i++){
-            //    console.log("Ran")
-              //spawn obstacles
-          //    this._spawnObstacles();
-          //  }
 
-
-            //spawn bonuses
-            //for(let i = 0;i<10;i++){
-              //  this._spawnBonuses();
-           // }
-            /*
-            // move the camera back so it can see the model
-            camera.rotateX(-20 * Math.PI/180);
-            
-            camera.position.set(0, 1.5, 2);
-            */
-            
-        }else{
-            for(let i = 0;i<30;i++){
+            for(let i = 0;i<10;i++){
                 console.log("Ran")
               //spawn obstacles
               this._spawnObstacles();
             }
+
+
+            //spawn bonuses
+            for(let i = 0;i<10;i++){
+                this._spawnBonuses();
+            }
+            
+            // move the camera back so it can see the model
+            camera.rotateX(-20 * Math.PI/180);
+            
+            camera.position.set(0, 1.5, 2);
+            
+        }else{
             //replay
             this.objectsParent.traverse((item) =>{
                 if(item instanceof THREE.Mesh){
@@ -655,7 +576,7 @@ class Game{
                         this._setupObstacle(item);
                     }
                     else{
-                       item.userData.price = this._setupBonus(item);
+                        item.userData.price = this._setupBonus(item);
 
                     }
                 }else{
@@ -711,9 +632,9 @@ class Game{
         
         //random position 
         obj.position.set(
-            refXPos + this._randomfloat(-30,30),  //objects to apppear in front of the player 
+            refXPos + this._randomfloat(-1000,500),  //objects to apppear in front of the player 
             obj.scale.y* 0.5,  // the object will placed on the grid 
-            refZPos -100- this._randomfloat(-70,10)  // to populate in the horison
+            refZPos -100- this._randomfloat(0,10)  // to populate in the horison
         );
 
         
@@ -733,7 +654,7 @@ class Game{
         obj.position.set(
             refXPos + this._randomfloat(-30,30),  //objects to apppear in front of the player 
             obj.scale.y* 0.5,  // the object will placed on the grid 
-            refZPos -100- this._randomfloat(0,200)  // to populate in the horison
+            refZPos -100- this._randomfloat(0,100)  // to populate in the horison
         );
         
         return price;

@@ -8,6 +8,7 @@ function init(){
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     //Adding fog to the scene
+    //All the scences must be converted to stages
     scene.fog = new THREE.Fog(0x000000, 120, 160);
   
     renderer = new THREE.WebGLRenderer();
