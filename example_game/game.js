@@ -1,10 +1,10 @@
 class Game{
     OBSTACLE_PREFAB = new THREE.BoxBufferGeometry(1,1,1);
-    OBSTACLE_MATERIAL = new THREE.MeshBasicMaterial({ color: 0xccdeee});
+    OBSTACLE_MATERIAL = new THREE.MeshPhongMaterial({ color: 0xccdeee});
     BONUS_PREFAB = new THREE.SphereBufferGeometry(1,12,12);
     COLLISION_THRESHOLD = 0.2;
     
-    constructor(scene,camera){
+    constructor(scene,camera,light){
         
         //get these elements from the base.css 
         this.divStage = document.getElementById('stage');
@@ -12,14 +12,14 @@ class Game{
         this.divDistance = document.getElementById('distance');
         this.divScore = document.getElementById('score');
         this.divBall = document.getElementById('ball_title');
-        
+        this.light = light;
         //start button functionality
         document.getElementById('start_btn').onclick = () =>{
             this.running = true;
             document.getElementById('intro_panel').style.display = 'none';
             
         };
-
+        // Replay button functionality 
         document.getElementById('replay_button').onclick = () =>{
             this.running = true;
             this.divGameOverPanel.style.display = 'none';
@@ -35,6 +35,7 @@ class Game{
         this.scene = scene;
         this.camera = camera;
 
+        //next level 
         document.getElementById('next_level_button').onclick = () =>{
             this.running = true;
             this.divGameWonPanel.style.display = 'none';
@@ -65,16 +66,37 @@ class Game{
             this.rotationLerp.update(timeDelta);
         }
 
-        this._mixers.map(mixer => mixer.update(0.03));
+        if(this._mixers){
+           this._mixers.map(mixer => mixer.update(timeDelta)); 
+        }
+        
 
         //controls this speed of the model
         this.translateX += this.speedX * -0.2;
         this._updateGrid();
         this._checkCollisions();
         this._updateInfoPAnel();
-        
+        this._UpdateSun();
     }
+
+
+    _updateObjects(timeDelta){
+        this.KILLERSS.rotateY(-0.2*timeDelta);
+        this.objectsParent.rotateY(-0.2*timeDelta);
+        this.Boosters.rotateY(-0.2*timeDelta);
+    }
+    //Update the light position
+    _UpdateSun() {
+        const player = this.OBJECT_MODEL;
+
+        const pos = player.position;
     
+        this.light.position.copy(pos);
+        this.light.position.add(new THREE.Vector3(-10, 500, -10));
+        this.light.target.position.copy(pos);
+        this.light.updateMatrixWorld();
+        this.light.target.updateMatrixWorld();
+      }
 
     _reset(replay){
         //initailize variables 
@@ -88,9 +110,6 @@ class Game{
         this.rotationLerp = null;
         this.time = 0;
         this.clock = new THREE.Clock();
-
-        this._mixers = [];
-        this._mixers_idle = [];
         
 
         //show initial value
@@ -118,9 +137,6 @@ class Game{
         this.rotationLerp = null;
         this.time = 0;
         this.clock = new THREE.Clock();
-
-        //this._mixers = [];
-        //this._mixers_idle = [];
         
 
         //show initial value
@@ -147,11 +163,7 @@ class Game{
         this.time = 0;
         this.clock = new THREE.Clock();
 
-        //this._mixers = [];
-        //this._mixers_idle = [];
-        
-
-        //show initial value
+        //show initial values
         this.divDistance.innerText = 600;
         this.divStage.innerText = this.stage;
         this.divHealth.value = this.health;
@@ -161,28 +173,30 @@ class Game{
         this._StageThree(this.scene,this.camera,replay);
     } 
 
-   sleep(func,ms) {
-        setTimeout(func,ms)}
    async sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms))
       }
 
 
     red(){
-        //this is to spawn the killer functions
+        //this is to spawn the killer obstacles 
         this.divBall.value = 'red';
-        this._spawnKillers();
+        for(let  i = 0; i < 2;i++){
+            this._spawnKillers();
+        }
+        
     }
     
     _spawnKillers(){
-        const material = new THREE.MeshBasicMaterial( { color: "red" } );
+        const material = new THREE.MeshPhongMaterial( { color: "red" } );
         const killers = new THREE.Mesh(
             this.OBSTACLE_PREFAB,
             material
         );
         
         this._setupObstacle(killers);
-
+        killers.castShadow = true;
+        killers.receiveShadow=true;
         this.KILLERSS.add(killers);
         
     }
@@ -190,8 +204,10 @@ class Game{
     green(){
         
         this.divBall.value = 'green';
-        this._spawnBoosters();
-             
+        for(let i = 0;i<2;i++){
+            this._spawnBoosters();
+        }
+       
     }
 
 
@@ -200,9 +216,10 @@ class Game{
 
         this.red();
         await this.sleep(10000);
-        this.green()
-        await this.sleep(5000);           
-        this._change();
+        this.green();
+
+        await this.sleep(10000);           
+        this._change.bind(this);
 
     }
 
@@ -256,13 +273,15 @@ class Game{
 
         //this makes the grid 'move' 
         this.grid.material.uniforms.time.value =this.time;
+        this.grid.material.uniforms.translateX.value =this.translateX;
+
 
         //this makes the objects seem like they are coming towards the player
         this.objectsParent.position.z = this.speedZ *this.time;
         this.KILLERSS.position.z = this.speedZ *this.time;
         this.Boosters.position.z = this.speedZ *this.time;
         // to make the actual object('I think')
-        this.grid.material.uniforms.translateX.value =this.translateX;
+        
         this.objectsParent.position.x = this.translateX;
         this.KILLERSS.position.x = this.translateX;
         this.Boosters.position.x = this.translateX;
@@ -327,7 +346,7 @@ class Game{
     }
     
     _checkCollisions(){
-        
+        const distance = this.objectsParent.position.z.toFixed(0);
         //obstacles and points
         this.objectsParent.traverse((child)=> {
             //check that we are in a child
@@ -369,6 +388,13 @@ class Game{
                         //Go to level 3
                         if(this.score > 30 && this.stage == 2){
                            this._setUpStage3();
+                        }
+
+                        if(distance>5000 && this.stage == 3){
+                            setTimeout(() => {
+                                this.divGameWonPanel.style.display = 'grid';
+                                this._reset(true);
+                            });
                         }
                        
 
@@ -415,7 +441,10 @@ class Game{
                ){
                    //Boosters increase the health of the player
                 const params = [child,-this.translateX,this.Boosters.position.z];
+                if(this.health <= 100){
                     this.health +=10;
+                }
+                    
                     this.divHealth.value = this.health;
                     console.log('Health:' ,this.health);
                     this._setupObstacle(...params);
@@ -481,6 +510,9 @@ class Game{
     }
 
     _createModel(scene){
+        // To make the animation play 
+        this._mixers = [];
+        //Loads the model
         const loader = new THREE.FBXLoader();
         loader.setPath('./resources/models/');
         loader.load('model1.fbx', (fbx)=>{
@@ -488,41 +520,33 @@ class Game{
 
         this.OBJECT_MODEL.rotateY(-180* Math.PI/180);
         this.OBJECT_MODEL.scale.multiplyScalar(0.01);
-        //scene.add(this.OBJECT_MODEL);
+        fbx.traverse(c =>{
+            c.castShadow = true;
+            c.receiveShadow = true; 
+        });
         
-        //animations
+        // load and play the animation of the model
         
         const anim = new THREE.FBXLoader();
         anim.setPath('./resources/models/');
         anim.load('Running.fbx', (anim) => {
-          const mixer  = new THREE.AnimationMixer(this.OBJECT_MODEL);
+          const mixer  = new THREE.AnimationMixer(fbx);
           this._mixers.push(mixer);
  
           const action = mixer.clipAction(anim.animations[0]);
-          
-          action.play();
-        });
-
-        const animIdle = new THREE.FBXLoader();
-        animIdle.setPath('./resources/models/');
-        animIdle.load('walking.fbx', (anim) => {
-          const mixer  = new THREE.AnimationMixer(this.OBJECT_MODEL);
-          this._mixers_idle.push(mixer);
- 
-          const action = mixer.clipAction(anim.animations[0]);
-          
+          action.enabled = true;
+          action.clampWhenFinished = true;
           action.play();
         });
    
-         scene.add(this.OBJECT_MODEL);
+         scene.add(fbx);
     
         });
          
     }
 
     _createGrid(scene) {
-        
-        
+        // create the moving 'illusion'
         let divisions = 30;
         let gridLimit = 200;
         this.grid = new THREE.GridHelper(gridLimit * 2, divisions, 0xccddee, 0xccddee);
@@ -556,7 +580,6 @@ class Game{
             uniform vec2 gridLimits;
             uniform float speedZ;
             uniform float translateX;
-
             attribute float moveableZ;
             attribute float moveableX;
 
@@ -582,10 +605,12 @@ class Game{
             }
           `,
           fragmentShader: `
+            precision mediump float;
             varying vec3 vColor;
-          
+            
             void main() {
-              gl_FragColor = vec4(vColor, 1.); // r, g, b channels + alpha (transparency)
+              
+              gl_FragColor = vec4(vColor, 1.0); // r, g, b channels + alpha (transparency)
             }
           `,
           vertexColors: THREE.VertexColors
@@ -599,35 +624,35 @@ class Game{
     _initializeScene(scene,camera,replay){
 
         if(!replay){
-            //first load
-            const light = new THREE.AmbientLight("#FFFFFF");
-            scene.add(light);
+
+            // move the camera back so it can see the model
+            camera.rotateX(-20 * Math.PI/180);
+            
+            camera.position.set(0, 1.5, 2);
             //prepare 3D scene
+            //Add the grid 
+            this._createGrid(scene)
+            
             this._createModel(scene);
-            this._createGrid(scene);
+             // this for loading obstacles and bonuses
+             this.objectsParent = new THREE.Group();
+             scene.add(this.objectsParent);
+ 
+             this.KILLERSS = new THREE.Group();
             
-            // this for loading obstacles and bonuses
-            this.objectsParent = new THREE.Group();
-            scene.add(this.objectsParent);
-
-            this.KILLERSS = new THREE.Group();
-            scene.add(this.KILLERSS);
-
-            this.Boosters = new THREE.Group();
-            scene.add(this.Boosters);
-            
-            
+ 
+             this.Boosters = new THREE.Group();
+    
             //spawn bonuses
             for(let i = 0;i<10;i++){
                 this._spawnBonuses();
             }
 
-    
+                scene.add(this.KILLERSS);
             
-            // move the camera back so it can see the model
-            camera.rotateX(-20 * Math.PI/180);
+               scene.add(this.Boosters); 
             
-            camera.position.set(0, 1.5, 2);
+            
 
         }else{
             //replay
@@ -662,6 +687,7 @@ class Game{
            
             
         }else{
+            scene.background = new THREE.Color('blue');
             for(let i = 0;i<15;i++){
                 console.log("Ran")
               //spawn obstacles
@@ -691,35 +717,7 @@ class Game{
 
         console.log("Hi stage 3 | replay ", replay);
         if(!replay){
-            /*
-            //first load
-            const light = new THREE.AmbientLight("#F78FFF");
-            scene.add(light);
-            //prepare 3D scene
-            this._createModel(scene);
-            this._createGrid(scene);
-            
-            // this for loading obstacles and bonuses
-            this.objectsParent = new THREE.Group();
-            scene.add(this.objectsParent);
-*/
-           // for(let i = 0;i<10;i++){
-            //    console.log("Ran")
-              //spawn obstacles
-          //    this._spawnObstacles();
-          //  }
-
-
-            //spawn bonuses
-            //for(let i = 0;i<10;i++){
-              //  this._spawnBonuses();
-           // }
-            /*
-            // move the camera back so it can see the model
-            camera.rotateX(-20 * Math.PI/180);
-            
-            camera.position.set(0, 1.5, 2);
-            */
+        //do nothing;
             
         }else{
             for(let i = 0;i<30;i++){
@@ -748,14 +746,15 @@ class Game{
     }
 
     _spawnObstacles(){
-        // create geometry 
+        // create geometry of the obstacles 
         const obj = new THREE.Mesh(
             this.OBSTACLE_PREFAB,
             this.OBSTACLE_MATERIAL
         );
 //get random class
         this._setupObstacle(obj);
-        
+        obj.castShadow=true;
+        obj.receiveShadow=true;
         //setup a label for the object
         obj.userData = {type: 'obstacle'};
         
@@ -764,11 +763,13 @@ class Game{
     }
 
     _spawnBonuses(){
+        const texture = new THREE.TextureLoader().load('./textures/gold.jpg');
+        const material = new THREE.MeshBasicMaterial({map:texture});
         const obj = new THREE.Mesh(
             this.BONUS_PREFAB,
-            new THREE.MeshBasicMaterial({color: 0x000000})
+            material
         );
-
+        
         const price =this._setupBonus(obj);
         
         //setup a label for the object
@@ -782,11 +783,12 @@ class Game{
     _spawnBoosters(){
         const obj = new THREE.Mesh(
             this.BONUS_PREFAB,
-            new THREE.MeshBasicMaterial({color: 'green'})
+            new THREE.MeshPhongMaterial({color: 'green'})
         );
         
         this._setupObstacle(obj);
-
+        obj.castShadow=true;
+        obj.receiveShadow=true;
         // add to scene
         this.Boosters.add(obj);
 
@@ -805,35 +807,33 @@ class Game{
         //random position 
         obj.position.set(
             refXPos + this._randomfloat(-30,30),  //objects to apppear in front of the player 
-            obj.scale.y* 0.5,  // the object will placed on the grid 
+            obj.scale.y,  // the object will placed on the grid 
             refZPos -100- this._randomfloat(-70,10)  // to populate in the horison
         );
-
+        
+        
         
     }
 
     _setupBonus(obj,refXPos = 0,refZPos = 0){
+        obj.castShadow=true;
+        obj.receiveShadow=true;
+        // set value for the coin 
         const price = this._randomInt(5,20);
         const ratio = price/20;
-
+        //size of the coin 
         const size = ratio * 0.5;
         obj.scale.set(size,size,size);
 
-        const hue  =0.5 + 0.5*ratio;
-        obj.material.color.setHSL(hue,1.,0.5);
 
         //random position 
         obj.position.set(
             refXPos + this._randomfloat(-30,30),  //objects to apppear in front of the player 
-            obj.scale.y* 0.5,  // the object will placed on the grid 
+            obj.scale.y,  // the object will placed on the grid 
             refZPos -100- this._randomfloat(0,200)  // to populate in the horison
         );
         
         return price;
-    }
-
-    _changing_ball(){
-
     }
 
     _randomInt(min,max){
