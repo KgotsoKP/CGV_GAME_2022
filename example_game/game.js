@@ -104,7 +104,7 @@ class Game{
         this.speedZ = 10;
         this.speedX = 0;  //-1:left, 0:straight, 1:right
         this.translateX = 0;
-        this.health  = 10;
+        this.health  = 100;
         this.stage = 1;
         this.score = 0;
         this.rotationLerp = null;
@@ -131,7 +131,7 @@ class Game{
         this.speedZ = 10;
         this.speedX = 0;  //-1:left, 0:straight, 1:right
         this.translateX = 0;
-        this.health  = 10;
+        this.health  = 100;
         this.stage = 2;
         this.score = 25;
         this.rotationLerp = null;
@@ -156,7 +156,7 @@ class Game{
         this.speedZ = 10;
         this.speedX = 0;  //-1:left, 0:straight, 1:right
         this.translateX = 0;
-        this.health  = 10;
+        this.health  = 50;
         this.stage = 3;
         this.score = 0;
         this.rotationLerp = null;
@@ -387,10 +387,11 @@ class Game{
                         console.log('score:',this.score);
                         child.userData.price = this._setupBonus(...params);
                         this.divScore.innerText= this.score;
-                        
+                        const curr_score = this.score;
 
                         //Go to level 2
                         if(this.score > 20 && this.stage == 1){
+                            
                            this._setUpStage2();
                         }
 
