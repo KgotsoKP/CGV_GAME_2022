@@ -3,7 +3,7 @@ var soundAudio;
 function setupAudio() {
     // background music
     const musicAudio = new Howl({
-    src: ['./resources/space.mp3'],
+    src: ['./resources/S.mp3'],
     
     autoplay: true,
     loop: true,
