@@ -40,7 +40,7 @@ function init(){
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFFFFF);
-    scene.fog = new THREE.FogExp2(0x89b2eb, 0.002);
+    scene.fog = new THREE.Fog(0x000000, 120, 160);
     //All the scences must be converted to stages
 
     let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
@@ -61,16 +61,47 @@ function init(){
    
 
     this._sun = light;
-
+    /*const texture = new THREE.TextureLoader().load('./textures/ground_stage1.jpg');
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set( 10000, 10000 );
+    texture.anisotropy = 16;
+    texture.encoding = THREE.sRGBEncoding;
+    const material = new THREE.MeshStandardMaterial({map:texture});
+    material.needsUpdate = true;
     const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(5000, 5000, 10, 10),
-        new THREE.MeshStandardMaterial({
-            color: 0x1e601c, //change the colour of the floor here
-          }));
+         new THREE.PlaneBufferGeometry( 10000, 10000 ),
+          material);
     plane.castShadow = false;
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI / 2;
-    scene.add(plane);
+    scene.add(plane);*/
+
+    const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
+
+		const water = new THREE.Water(
+					waterGeometry,
+					{
+						textureWidth: 512,
+						textureHeight: 512,
+						waterNormals: new THREE.TextureLoader().load( './textures/waternormals.jpg', function ( texture ) {
+
+							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+              texture.repeat.set( 10000, 10000 );
+              texture.anisotropy = 16;
+              texture.encoding = THREE.sRGBEncoding;
+
+						} ),
+						sunDirection: new THREE.Vector3(),
+						sunColor: 0xffffff,
+						waterColor: 0xcccccc,
+						distortionScale: 3.7,
+						fog: scene.fog !== undefined
+					}
+				);
+
+				water.rotation.x = - Math.PI / 2;
+
+		scene.add( water );
     _LoadSky();
     const gameInstance = new Game(scene,camera,light);
     window.addEventListener('resize', () => {
@@ -127,5 +158,6 @@ function init(){
 
 
 window.onload = () => {
+    setupAudio();
     init();
   };

@@ -2,7 +2,7 @@ class Game{
     OBSTACLE_PREFAB = new THREE.BoxBufferGeometry(1,1,1);
     OBSTACLE_MATERIAL = new THREE.MeshPhongMaterial({ color: 0xccdeee});
     BONUS_PREFAB = new THREE.SphereBufferGeometry(1,12,12);
-    COLLISION_THRESHOLD = 0.2;
+    COLLISION_THRESHOLD = 0.5;
     
     constructor(scene,camera,light){
         
@@ -366,13 +366,23 @@ class Game{
                 const params = [child,-this.translateX,this.objectsParent.position.z];
                    if (child.userData.type === 'obstacle'){
                         this.health -=10;
+                        
                         this.divHealth.value = this.health;
                         console.log('Health:' ,this.health);
                         this._setupObstacle(...params);
                         if (this.health <=0){
                             this._gameOver()
                         }
+
+                        if (soundAudio){
+                            soundAudio.play('crash');
+                        }
+                        
                    }else{
+                        if (soundAudio) {
+                            const soundIndex = Math.floor(7 * (child.userData.price - 5) / (20 - 5));
+                            soundAudio.play(`bonus-${soundIndex}`);
+                        }
                         this.score+=child.userData.price;
                         console.log('score:',this.score);
                         child.userData.price = this._setupBonus(...params);
@@ -390,7 +400,7 @@ class Game{
                            this._setUpStage3();
                         }
 
-                        if(distance>5000 && this.stage == 3){
+                        if(distance>2000 && this.stage == 3){
                             setTimeout(() => {
                                 this.divGameWonPanel.style.display = 'grid';
                                 this._reset(true);
@@ -418,6 +428,9 @@ class Game{
                childZPos > -thresholdZ &&
                Math.abs(child.position.x + this.translateX)< thresholdX
                 ){
+                    if (soundAudio){
+                        soundAudio.play('crash');
+                    }
                //Collisions
                this._gameOver();
              }
@@ -441,13 +454,19 @@ class Game{
                ){
                    //Boosters increase the health of the player
                 const params = [child,-this.translateX,this.Boosters.position.z];
-                if(this.health <= 100){
+                if(this.health < 100){
                     this.health +=10;
-                }
-                    
                     this.divHealth.value = this.health;
                     console.log('Health:' ,this.health);
                     this._setupObstacle(...params);
+                }
+
+                if (soundAudio) {
+                    const soundIndex = Math.floor(7 * (child.userData.price - 5) / (20 - 5));
+                    soundAudio.play(`bonus-${soundIndex}`);
+                }
+                    
+                    
                }
 
             
@@ -498,6 +517,7 @@ class Game{
         //prepare the endstate 
         this.running = false;
 
+        this.health = 50;
         
         //show ui 
         this.divGameWonScore.innerText = this.score;
@@ -513,21 +533,21 @@ class Game{
         // To make the animation play 
         this._mixers = [];
         //Loads the model
-        const loader = new THREE.FBXLoader();
-        loader.setPath('./resources/models/');
-        loader.load('model1.fbx', (fbx)=>{
-        this.OBJECT_MODEL = fbx;
+        const loader = new THREE.GLTFLoader();
+        loader.setPath('./resources/models/spaceship_raider_class__pathfinder/');
+        loader.load('scene.gltf', (gltf)=>{
+        this.OBJECT_MODEL = gltf.scene;
 
         this.OBJECT_MODEL.rotateY(-180* Math.PI/180);
-        this.OBJECT_MODEL.scale.multiplyScalar(0.01);
-        fbx.traverse(c =>{
+        this.OBJECT_MODEL.scale.multiplyScalar(0.25);
+        gltf.scene.traverse(c =>{
             c.castShadow = true;
             c.receiveShadow = true; 
         });
         
         // load and play the animation of the model
         
-        const anim = new THREE.FBXLoader();
+        /*const anim = new THREE.FBXLoader();
         anim.setPath('./resources/models/');
         anim.load('Running.fbx', (anim) => {
           const mixer  = new THREE.AnimationMixer(fbx);
@@ -537,9 +557,9 @@ class Game{
           action.enabled = true;
           action.clampWhenFinished = true;
           action.play();
-        });
+        });*/
    
-         scene.add(fbx);
+         scene.add(gltf.scene);
     
         });
          
@@ -628,10 +648,10 @@ class Game{
             // move the camera back so it can see the model
             camera.rotateX(-20 * Math.PI/180);
             
-            camera.position.set(0, 1.5, 2);
+            camera.position.set(0, 1.5, 5);
             //prepare 3D scene
             //Add the grid 
-            this._createGrid(scene)
+            this._createGrid(scene);
             
             this._createModel(scene);
              // this for loading obstacles and bonuses
@@ -747,9 +767,11 @@ class Game{
 
     _spawnObstacles(){
         // create geometry of the obstacles 
+        const texture2 = new THREE.TextureLoader().load('./textures/brick.jpg');
+        const material2 = new THREE.MeshPhongMaterial({map:texture2});
         const obj = new THREE.Mesh(
             this.OBSTACLE_PREFAB,
-            this.OBSTACLE_MATERIAL
+            material2
         );
 //get random class
         this._setupObstacle(obj);
@@ -844,6 +866,10 @@ class Game{
 
     _randomfloat(min,max){
         return Math.random() *(max -min) + min;
+    }
+
+    _shakeCamera(initialPos){
+
     }
 
 }

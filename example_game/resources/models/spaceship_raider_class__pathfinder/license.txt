@@ -1,0 +1,11 @@
+Model Information:
+* title:	Spaceship Raider Class : Pathfinder
+* source:	https://sketchfab.com/3d-models/spaceship-raider-class-pathfinder-0e64370057db4c8f9eaaa96bd4d0e289
+* author:	Rishav Gupta (https://sketchfab.com/Rishav_Gupta)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Spaceship Raider Class : Pathfinder" (https://sketchfab.com/3d-models/spaceship-raider-class-pathfinder-0e64370057db4c8f9eaaa96bd4d0e289) by Rishav Gupta (https://sketchfab.com/Rishav_Gupta) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
