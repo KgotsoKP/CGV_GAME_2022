@@ -138,7 +138,7 @@ class Game{
         
 
         //show initial value
-        this.divDistance.innerText = 500;
+        this.divDistance.innerText = 0;
         this.divStage.innerText = this.stage;
         this.divHealth.value = this.health;
         this.divScore.innerText = this.score;
@@ -162,7 +162,7 @@ class Game{
         this.clock = new THREE.Clock();
 
         //show initial values
-        this.divDistance.innerText = 600;
+        this.divDistance.innerText = 0;
         this.divStage.innerText = this.stage;
         this.divHealth.value = this.health;
         this.divScore.innerText = this.score;
@@ -389,7 +389,7 @@ class Game{
                         const curr_score = this.score;
 
                         //Go to level 2
-                        if(this.score > 20 && this.stage == 1){
+                        if(this.score > 20 && this.stage === 1){
                             
                             //set up texts
                             this.CurrentLevel.innerHTML = this.stage
@@ -399,14 +399,14 @@ class Game{
 
 
                         //Go to level 3
-                        if(this.score > 30 && this.stage == 2){
+                        if(this.score > 30 && this.stage === 2){
                             //set up texts
                             this.CurrentLevel.innerHTML = this.stage
                             this.NextLevel.innerHTML = this.stage + 1
                            this._setUpStage3();
                         }
 
-                        if(distance>500 && this.stage == 3){
+                        if(this.objectsParent.position.z.toFixed(0) > 500 && this.stage === 3){
                             setTimeout(() => {
                                 this.CurrentLevel.innerHTML = this.stage;
                                 this.NextLevel.innerHTML = "You are the ultimate Survivor!"
