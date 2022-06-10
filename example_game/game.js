@@ -1,8 +1,8 @@
 class Game{
+    // declaring all the objects geometry 
     OBSTACLE_PREFAB = new THREE.BoxBufferGeometry(1,1,1);
-    OBSTACLE_MATERIAL = new THREE.MeshPhongMaterial({ color: 0xccdeee});
     BONUS_PREFAB = new THREE.SphereBufferGeometry(1,12,12);
-    COLLISION_THRESHOLD = 0.5;
+    COLLISION_THRESHOLD = 0.6;
     
     constructor(scene,camera,light){
          
@@ -11,7 +11,6 @@ class Game{
         this.divHealth = document.getElementById('health');
         this.divDistance = document.getElementById('distance');
         this.divScore = document.getElementById('score');
-        this.divBall = document.getElementById('ball_title');
         this.CurrentLevel = document.getElementById('current_level');
         this.NextLevel = document.getElementById('next_level');
         this.light = light;
@@ -72,26 +71,18 @@ class Game{
         if(this.rotationLerp!== null){
             this.rotationLerp.update(timeDelta);
         }
-
-        if(this._mixers){
-           this._mixers.map(mixer => mixer.update(timeDelta)); 
-        }
         
 
         //controls this speed of the model
         this.translateX += this.speedX * -0.15;
+        // to animate every frame 
         this._updateGrid();
         this._checkCollisions();
         this._updateInfoPAnel();
         this._UpdateSun();
+
     }
 
-
-    _updateObjects(timeDelta){
-        this.KILLERSS.rotateY(-0.2*timeDelta);
-        this.objectsParent.rotateY(-0.2*timeDelta);
-        this.Boosters.rotateY(-0.2*timeDelta);
-    }
     //Update the light position
     _UpdateSun() {
         const player = this.OBJECT_MODEL;
@@ -194,6 +185,7 @@ class Game{
     }
     
     _spawnKillers(){
+        //creates the red killers
         const material = new THREE.MeshPhongMaterial( { color: "red" } );
         const killers = new THREE.Mesh(
             this.OBSTACLE_PREFAB,
@@ -208,7 +200,7 @@ class Game{
     }
 
     green(){
-        
+        //spawn the boosters
         for(let i = 0;i<2;i++){
             this._spawnBoosters();
         }
@@ -216,7 +208,7 @@ class Game{
     }
 
 
-
+    //to generate boosters and killers 
    async _change(){
 
         this.red();
@@ -286,8 +278,8 @@ class Game{
         this.objectsParent.position.z = this.speedZ *this.time;
         this.KILLERSS.position.z = this.speedZ *this.time;
         this.Boosters.position.z = this.speedZ *this.time;
-        // to make the actual object('I think')
         
+        //to make the objects move "sideways"
         this.objectsParent.position.x = this.translateX;
         this.KILLERSS.position.x = this.translateX;
         this.Boosters.position.x = this.translateX;
@@ -376,10 +368,11 @@ class Game{
                         this.divHealth.value = this.health;
                         console.log('Health:' ,this.health);
                         this._setupObstacle(...params);
+                        //health control
                         if (this.health <=0){
                             this._gameOver()
                         }
-
+                        //play sound
                         if (soundAudio){
                             soundAudio.play('crash');
                         }
@@ -413,7 +406,7 @@ class Game{
                            this._setUpStage3();
                         }
 
-                        if(distance>200 && this.stage == 3){
+                        if(distance>2000 && this.stage == 3){
                             setTimeout(() => {
                                 this.CurrentLevel.innerHTML = this.stage;
                                 this.NextLevel.innerHTML = "You are a Champion"
@@ -442,7 +435,7 @@ class Game{
            if(
                childZPos > -thresholdZ &&
                Math.abs(child.position.x + this.translateX)< thresholdX
-                ){
+                ){//play sound first
                     if (soundAudio){
                         soundAudio.play('crash');
                     }
@@ -475,9 +468,9 @@ class Game{
                     console.log('Health:' ,this.health);
                     this._setupObstacle(...params);
                 }
-
+                //play sound
                 if (soundAudio) {
-                    const soundIndex = Math.floor(7 * (child.userData.price - 5) / (20 - 5));
+                    const soundIndex = 1;
                     soundAudio.play(`bonus-${soundIndex}`);
                 }
                     
@@ -488,7 +481,7 @@ class Game{
             }
        });
     }
-
+    // update information on panel 
     _updateInfoPAnel(){
         this.divDistance.innerText = this.objectsParent.position.z.toFixed(0);
     }
@@ -547,9 +540,8 @@ class Game{
     }
 
     _createModel(scene){
-        // To make the animation play 
-        this._mixers = [];
-        //Loads the model
+
+        //Loads the spaceships
         const loader = new THREE.GLTFLoader();
         loader.setPath('./resources/models/spaceship_raider_class__pathfinder/');
         loader.load('scene.gltf', (gltf)=>{
@@ -561,20 +553,6 @@ class Game{
             c.castShadow = true;
             c.receiveShadow = true; 
         });
-        
-        // load and play the animation of the model
-        
-        /*const anim = new THREE.FBXLoader();
-        anim.setPath('./resources/models/');
-        anim.load('Running.fbx', (anim) => {
-          const mixer  = new THREE.AnimationMixer(fbx);
-          this._mixers.push(mixer);
- 
-          const action = mixer.clipAction(anim.animations[0]);
-          action.enabled = true;
-          action.clampWhenFinished = true;
-          action.play();
-        });*/
    
          scene.add(gltf.scene);
     
@@ -715,7 +693,7 @@ class Game{
 
     }
 
-    _StageTwo(scene,camera,replay){
+    _StageTwo(scene,replay){
 
         if(!replay){
             
