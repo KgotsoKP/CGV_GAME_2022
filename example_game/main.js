@@ -1,4 +1,4 @@
-
+//shaders
 const _VS = `
 varying vec3 vWorldPosition;
 void main() {
@@ -19,7 +19,8 @@ void main() {
   gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
 }`;
 
-var scene,camera,renderer,cube;
+//declaring essential variables
+var scene,camera,renderer;
 
 
 function init(){
@@ -34,15 +35,15 @@ function init(){
     document.body.appendChild(renderer.domElement);
     
 
-    
+    //set up camera and scene
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
     const controls = new THREE.OrbitControls (camera, renderer.domElement);
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFFFFF);
     scene.fog = new THREE.Fog(0x000000, 120, 160);
-    //All the scences must be converted to stages
-
+    
+    // set up lighting: Directional and Ambient
     let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
     light.position.set(-10, 500, 10);
     light.target.position.set(0, 0, 0);
@@ -58,26 +59,12 @@ function init(){
     light.shadow.camera.bottom = -100;
     scene.add(light);
 
-   
+    const a_light = new THREE.AmbientLight( 0x404040 ); // soft white light
+    scene.add( a_light );
 
-    this._sun = light;
-    /*const texture = new THREE.TextureLoader().load('./textures/ground_stage1.jpg');
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set( 10000, 10000 );
-    texture.anisotropy = 16;
-    texture.encoding = THREE.sRGBEncoding;
-    const material = new THREE.MeshStandardMaterial({map:texture});
-    material.needsUpdate = true;
-    const plane = new THREE.Mesh(
-         new THREE.PlaneBufferGeometry( 10000, 10000 ),
-          material);
-    plane.castShadow = false;
-    plane.receiveShadow = true;
-    plane.rotation.x = -Math.PI / 2;
-    scene.add(plane);*/
-
+    //create the water plane
     const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
-
+    //create the water plane
 		const water = new THREE.Water(
 					waterGeometry,
 					{
@@ -100,22 +87,20 @@ function init(){
 				);
 
 				water.rotation.x = - Math.PI / 2;
-
-		scene.add( water );
-
-
-
+        scene.add( water );
+    //load sky 
     _LoadSky();
+    //create game instance
     const gameInstance = new Game(scene,camera,light);
+
+
     window.addEventListener('resize', () => {
         _OnWindowResize(renderer,camera);
       }, false);
 
+      //animate next scene
     function animate(){
         controls.update();
-
-        
-
         requestAnimationFrame(animate);
 
         const time = performance.now() * 0.001;
@@ -136,6 +121,7 @@ function init(){
         renderer.setSize(window.innerWidth, window.innerHeight);
       }
 
+      //function to load skiy
       function _LoadSky() {
         const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
         hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -166,8 +152,8 @@ function init(){
 
 }
 
-
+//play app
 window.onload = () => {
-    setupAudio();
-    init();
+    setupAudio(); //load sounds
+    init(); 
   };
