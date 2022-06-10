@@ -5,14 +5,19 @@ class Game{
     COLLISION_THRESHOLD = 0.5;
     
     constructor(scene,camera,light){
-        
+         
         //get these elements from the base.css 
         this.divStage = document.getElementById('stage');
         this.divHealth = document.getElementById('health');
         this.divDistance = document.getElementById('distance');
         this.divScore = document.getElementById('score');
         this.divBall = document.getElementById('ball_title');
+        this.CurrentLevel = document.getElementById('current_level');
+        this.NextLevel = document.getElementById('next_level');
         this.light = light;
+
+      
+
         //start button functionality
         document.getElementById('start_btn').onclick = () =>{
             this.running = true;
@@ -21,6 +26,7 @@ class Game{
         };
         // Replay button functionality 
         document.getElementById('replay_button').onclick = () =>{
+            this._reset(true);
             this.running = true;
             this.divGameOverPanel.style.display = 'none';
         };
@@ -31,6 +37,7 @@ class Game{
         this.divGameOverScore = document.getElementById('game_score');
         this.divGameWonPanel = document.getElementById('game_won_panel');
         this.divGameWonDistance = document.getElementById('game_won_distance');
+        this.divGameWonHealth = document.getElementById('game_won_health');
         this.divGameWonScore = document.getElementById('game_won_score');
         this.scene = scene;
         this.camera = camera;
@@ -72,7 +79,7 @@ class Game{
         
 
         //controls this speed of the model
-        this.translateX += this.speedX * -0.2;
+        this.translateX += this.speedX * -0.15;
         this._updateGrid();
         this._checkCollisions();
         this._updateInfoPAnel();
@@ -180,7 +187,6 @@ class Game{
 
     red(){
         //this is to spawn the killer obstacles 
-        this.divBall.value = 'red';
         for(let  i = 0; i < 2;i++){
             this._spawnKillers();
         }
@@ -203,7 +209,6 @@ class Game{
 
     green(){
         
-        this.divBall.value = 'green';
         for(let i = 0;i<2;i++){
             this._spawnBoosters();
         }
@@ -266,6 +271,7 @@ class Game{
         }       
 
     _updateGrid(){
+        
         //speed up the game as it progresses
         this.speedZ += 0.002;
         this.grid.material.uniforms.speedZ.value =this.speedZ;
@@ -392,17 +398,25 @@ class Game{
                         //Go to level 2
                         if(this.score > 20 && this.stage == 1){
                             
+                            //set up texts
+                            this.CurrentLevel.innerHTML = this.stage
+                            this.NextLevel.innerHTML = this.stage + 1
                            this._setUpStage2();
                         }
 
 
                         //Go to level 3
                         if(this.score > 30 && this.stage == 2){
+                            //set up texts
+                            this.CurrentLevel.innerHTML = this.stage
+                            this.NextLevel.innerHTML = this.stage + 1
                            this._setUpStage3();
                         }
 
-                        if(distance>2000 && this.stage == 3){
+                        if(distance>200 && this.stage == 3){
                             setTimeout(() => {
+                                this.CurrentLevel.innerHTML = this.stage;
+                                this.NextLevel.innerHTML = "You are a Champion"
                                 this.divGameWonPanel.style.display = 'grid';
                                 this._reset(true);
                             });
@@ -503,6 +517,7 @@ class Game{
         
         //show ui 
         this.divGameWonScore.innerText = this.score;
+        this.divGameWonHealth.innerText = this.health;
         this.divGameWonDistance.innerText=this.objectsParent.position.z.toFixed(0);
         setTimeout(() => {
             this.divGameWonPanel.style.display = 'grid';
@@ -522,6 +537,7 @@ class Game{
         
         //show ui 
         this.divGameWonScore.innerText = this.score;
+        this.divGameWonHealth.innerText = this.health;
         this.divGameWonDistance.innerText=this.objectsParent.position.z.toFixed(0);
         setTimeout(() => {
             this.divGameWonPanel.style.display = 'grid';

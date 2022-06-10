@@ -44,10 +44,15 @@ body {
 }
 
 #intro_panel{
-  background: linear-gradient(to left, rgba(0,0,0,0) -250%,
-  rgba(0,0,0,1)), url(./assets/YTAGyQ.jpg);
+  background: linear-gradient(to left, rgba(0,0,0,0) 50%,
+  rgb(0, 81, 255)), url(./assets/Game_Cover.png);
   color: white;
+  background-repeat: no-repeat;
   position: absolute;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
   top: 0;
   right:0;
   left: 0;
@@ -75,12 +80,33 @@ body {
 
 #game_over_panel {
   display: none;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.314) 50%,
+  rgb(28, 31, 39)), url(./assets/game_over.jpg);
 }
 
 
 #game_won_panel{
   display: none;
+  animation: gradient 15s ease infinite;
+ /*background-color: #045de9;*/
+background : linear-gradient(-45deg, #045de9 0%, #09c6f9 74%);
+
 }
+
+@keyframes gradient  {
+  0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+ 
+
 
 #intro_column,
 .bottom_column{

@@ -102,6 +102,9 @@ function init(){
 				water.rotation.x = - Math.PI / 2;
 
 		scene.add( water );
+
+
+
     _LoadSky();
     const gameInstance = new Game(scene,camera,light);
     window.addEventListener('resize', () => {
@@ -110,7 +113,15 @@ function init(){
 
     function animate(){
         controls.update();
+
+        
+
         requestAnimationFrame(animate);
+
+        const time = performance.now() * 0.001;
+				water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+
+
         gameInstance.update();
 
         renderer.render(scene, camera);
@@ -152,7 +163,6 @@ function init(){
         const sky = new THREE.Mesh(skyGeo, skyMat);
         scene.add(sky);
       }
-
 
 }
 
