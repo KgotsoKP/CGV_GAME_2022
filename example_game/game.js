@@ -406,10 +406,10 @@ class Game{
                            this._setUpStage3();
                         }
 
-                        if(distance>2000 && this.stage == 3){
+                        if(distance>500 && this.stage == 3){
                             setTimeout(() => {
                                 this.CurrentLevel.innerHTML = this.stage;
-                                this.NextLevel.innerHTML = "You are a Champion"
+                                this.NextLevel.innerHTML = "You are the ultimate Survivor!"
                                 this.divGameWonPanel.style.display = 'grid';
                                 this._reset(true);
                             });
