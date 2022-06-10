@@ -32,10 +32,6 @@ body {
     font-family: monospace;
 }
 
-#score_row ,
-#distance_row {
- 
-}
 
 #score,
 #distance {
@@ -81,9 +77,6 @@ body {
   display: none;
 }
 
-.Instructions_panel{
-
-}
 
 #game_won_panel{
   display: none;
@@ -226,3 +219,24 @@ font-size: 36px;
   width: 50%;
   margin: auto;
 }
+.score-popup {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: score-popup 1s ease-in-out;
+  animation-iteration-count: 1;
+  font-size: 30px;
+  color: rgb(192, 16, 16);
+}
+
+@keyframes score-popup {
+  0% {
+    top: 33%;
+    opacity: 1;
+  }
+  100% {
+    top: 25%;
+    opacity: 0;
+  }
+}
+
