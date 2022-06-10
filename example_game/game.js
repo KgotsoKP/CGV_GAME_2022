@@ -628,7 +628,7 @@ class Game{
             // move the camera back so it can see the model
             camera.rotateX(-20 * Math.PI/180);
             
-            camera.position.set(0, 1.5, 2);
+            camera.position.set(0, 1.5,2);
             //prepare 3D scene
             //Add the grid 
             this._createGrid(scene)

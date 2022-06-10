@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ExampleGame</title>
+  <title>Red  Light Green Light</title>
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <link rel="stylesheet" type="text/css" href="base.css">
 </head>
@@ -16,21 +16,93 @@
   <script src = "./main.js" ></script>
 
   <div id = "info">
+    <!--
     <div id="title">Player's log</div>
+    -->
+
     <div class="divider"></div>
-    <div id="stage_row">Stage: <div id="stage"></div></div>
-    <div id="score_row">Score: <div id="score"></div></div>
-    <div id="distance_row">Distance: <div id="distance"></div></div>
+    <div class="divier_item" id="stage_row">
+      
+      <p id="stage"></p>
+      <p>Stage</p>
+  </div>
+
+    <div class="divier_item" id="score_row">
+      
+      <p id="score"></p>
+      <p>Score</p>
+    </div>
+
+    <div class="divier_item" id="distance_row">
+      
+      <p id="distance"></p>
+      <p>Distance</p>
+    </div>
+
     <div id="divider"></div>
-    <div>Player health</div>
+
+    <div class="player_health">
     <input id="health" type ="range" min="0" max="100" disabled>
+    <div>health</div>
+  </div>
     
   </div>
 
   <div id="intro_panel">
+
+    <h1>Red Light Green Light</h1>
+
+    <div class="center_container">
+    <div class="Instructions_panel">
+
+      <h3>How to play</h3>
+      <ul>
+        <li>Stage 1 : Avoid obsticiles</li>
+        <li>Step 2 : Red blocks reducnec our health</li>
+        <li>Step 3 : Green blls are boosters</li>
+        <li>Step 4 : Stage 1 you have a limited time only</li>
+        <li>Step 5 : get 30 points to move on to the next stage</li>
+      </ul>
+
+      <div class="game_elements">
+          <div class="item">
+           
+            <p class="item_display">0</p>
+            <p>Coins</p>
+            </div>
+
+          <div class="item">
+            
+            <p class="item_display">20</p>
+            <p>Bosters</p>
+            </div>
+
+          <div class="item">
+           
+            <p class="item_display">3</p>
+            <p>Obsticles</p>
+            </div>
+
+         <div class="item">
+            
+            <p class="item_display">3</p>
+            <p>Levels</p>
+            </div>
+      </div>
+    </div>
+ 
+    <div class="image_panel">
+     
+    </div>
+  </div>
+
     <div id="intro_column">
-    <div id="intro_title">Example Game</div>
-    <button id = "start_btn">Start</button>
+      <img class="player_image" src="./assets/player_char.png" height="100px" alt="">
+      <div class="stage_game_details">
+        <p>Worroir Lady</p>
+        <p> in the last years she continued to settle and began to shrink. Her mouth bowed forward and her brow sloped back, and her skull shone pink and speckled within a mere haze of hair, which hovered about her head like the remembered shape of an altered thing.</p>
+      </div>
+      <button id = "start_btn">Start</button>
     </div>
   </div>
 
@@ -43,18 +115,48 @@
     <button id = "replay_button">Replay</button>
     </div>
   </div>
-  <div id="ball_panel">
+
+  <!--  <div id="ball_panel">
     <div id="ball_column">
     <input type ="text" id="ball_title" disabled>
     </div>
   </div>
+-->
+
 
   <div id="game_won_panel">
     <div id="game_won_column">
-    <div id="game_won_title">You won</div>
-    <div id="game_won_score_row">Score: <div id="game_won_score"></div></div>
-    <div id="game_won_distance_row">Distance: <div id="game_won_distance"></div></div>
-    <button id = "next_level_button">Next Level</button>
+    <div id="game_won_title">Level Completed</div>
+
+    <div id="game_won_stats">
+    <div id="game_won_score_row">
+      <div class="item_display" id="game_won_score"></div>
+      <p >Score</p>
+    </div>
+
+    <div id="game_won_distance_row">
+      
+      <div class="item_display" id="game_won_distance"></div>
+      <p>Distance</p>
+    </div>
+
+     <div id="game_won_health_row">
+       
+       <div class="item_display" id="game_won_health"></div>
+       <p >Health</p>
+      </div>
+    </div>
+   
+
+
+
+    <div class="bottom_column" id="intro_column">
+      <img class="player_image" src="./assets/player_char.png" height="100px" alt="">
+      <div class="stage_game_details">
+        <p> Next Level : 2</p>
+      </div>
+      <button id = "next_level_button">Start</button>
+    </div>
   </div>
 </body> 
 

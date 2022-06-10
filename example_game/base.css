@@ -1,18 +1,26 @@
 body {
     margin: 0; 
+    font-family: monospace;
   }
 
 #info {
     position: absolute;
-    left: 0;
-    top: 0;
+    display: flex;
+    border-radius: 16px;
+    justify-content: space-evenly;
+    bottom: 16px;
+    Left: 0;
+    opacity: 0.5;
+    text-align: center;
+    transform:translateX(70%);
+    width: 40%;
     color: white;
     background-color: black;
-    border: 1px solid white;
     padding: 0.5rem;
     font-family: monospace;
 
 }
+
 
 #ball_panel {
     position: absolute;
@@ -26,7 +34,7 @@ body {
 
 #score_row ,
 #distance_row {
-  display: flex;
+ 
 }
 
 #score,
@@ -39,9 +47,23 @@ body {
   width: 100;
 }
 
-#intro_panel,
+#intro_panel{
+  background: linear-gradient(to left, rgba(0,0,0,0) -250%,
+  rgba(0,0,0,1)), url(./assets/YTAGyQ.jpg);
+  color: white;
+  position: absolute;
+  top: 0;
+  right:0;
+  left: 0;
+  bottom: 0;
+}
+
+
+
+
 #game_over_panel,
 #game_won_panel {
+  text-align: center;
   display: grid;
   place-items: center;
   position: absolute;
@@ -59,14 +81,80 @@ body {
   display: none;
 }
 
+.Instructions_panel{
+
+}
+
 #game_won_panel{
   display: none;
 }
 
 #intro_column,
+.bottom_column{
+  border-radius: 15px;
+  background-color: white;
+  color: black;
+  width: 60%;
+  padding: 6px;
+  display: flex;
+  margin: auto;
+  justify-content: space-around;
+  bottom: -50px;
+  position: relative;
+  align-items: center;
+}
+
+.game_elements,
+#game_won_stats{
+  display: flex;
+  justify-content: space-around;
+}
+
+.item{
+  text-align: center;
+}
+
+.item_display{
+font-size: 36px;
+}
+
+.image_panel{
+  width: 50%;
+  height: 50%;
+  background-color: blue;
+}
+
+.image_panel img{
+  width: 100%;
+  height: 100%;
+}
+
+#intro_panel h1{
+  text-align: center;
+  font-size: 50px;
+}
+
+
+.stage_game_details{
+  width: 60%;
+}
+
+
+
+.center_container{
+  display: flex;
+  margin: auto;
+  justify-content: space-between;
+  width: 80%;
+  padding:25px;
+}
+
+
+
 #game_over_column,
 #game_won_column {
   text-align: center;
+  width: 60%;
 }
 
 #intro_title,
@@ -77,11 +165,22 @@ body {
 }
 
 #start_btn,
+#next_level_button{
+  background-color: black;
+  color: white;
+  border-radius: 10px;
+  padding: 0px 36px;
+  height: 56px;
+  text-align: center;
+  font-size: large;
+  font-weight: bold;
+}
+
+
 #replay_button,
 #replay_won_button {
   background-color: black;
   color: white;
-  font-family: monospace;
   border: 1px solid white;
   padding: 0.5rem;
   cursor: pointer;
@@ -106,15 +205,24 @@ body {
   margin-left: 0.5rem;
 }
 
+
+
 #game_won_score_row,
-#game_won_distance_row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
+#game_won_distance_row,
+#game_won_health_row{
+  text-align: center;
 }
+
 
 #game_won_row,
 #game_won_distance {
   margin-left: 0.5rem;
+}
+
+
+#game_won_stats{
+  display: flex;
+  justify-content: space-between;
+  width: 50%;
+  margin: auto;
 }
