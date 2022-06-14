@@ -5,19 +5,16 @@
 
 Video Description link -
 
-
+1.
 1:33
 Intro and How to run the game(Team Inferno)
-
+2.
 1:06
 Player dying from both brick and red objects
-Music Mines
-
-
+3.
 2:55
 Winning and Progress through levels (Team Inferno)
-
-
+4.
 8:37
 Explaining of the code(Team Inferno)
 
