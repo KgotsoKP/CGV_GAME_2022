@@ -1,4 +1,8 @@
 # Computer Graphics and Visualisation 3D game
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 Video Description link -
 
 
@@ -11,6 +15,7 @@ Video Description link -
 
 
 
-<a href="https://www.youtube.com/playlist/[PL7SjTPM7lLFs6F967RB5l2yCup1VyCR05]">
- <img alt="Youtube Playlist" src="https://www.youtube.com/embed/videoseries?controls=0&amp;list=PL7SjTPM7lLFs6F967RB5l2yCup1VyCR05"/>
+<a href>
+ <img alt="Youtube Playlist"/>
+ <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?controls=0&amp;list=PL7SjTPM7lLFs6F967RB5l2yCup1VyCR05" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </a>
