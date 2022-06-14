@@ -4,6 +4,7 @@
 
 
 Video Description link -
+Click on image below to view playlist.
 
 1.
 1:33
