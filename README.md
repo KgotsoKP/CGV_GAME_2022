@@ -11,7 +11,7 @@ Our main style was to use different functions from different classes to interact
 Since this is a runner-based game we took the approach of continuously filling the level with boosters and obstacles for the player to keep on playing
 
 
-## Game Play (Video illustration) -
+## Game Play (Video Playlist) -
 Click on image below to view playlist.
 
 - 1:33 Intro and How to run the game(Team Inferno)
